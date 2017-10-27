@@ -283,6 +283,10 @@ window.onload = function () {
     document.getElementById('stopall').addEventListener('click', () => {
         vm.stopAll();
     });
+    document.getElementById('getblocks').addEventListener('click', function() {
+        stop_reading = true;
+        createBlocksInScratch();
+    });
     document.getElementById('turbomode').addEventListener('change', () => {
         const turboOn = document.getElementById('turbomode').checked;
         vm.setTurboMode(turboOn);
