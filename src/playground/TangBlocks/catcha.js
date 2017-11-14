@@ -76,13 +76,13 @@ createBlocksInScratch = function() {
   }
   console.log("teste last_codes_detected ", last_codes_detected);
   console.log("teste par_list_last ", par_list_last);
-  var codes = invert_list_order(last_codes_detected);
-  var pars = invert_list_order(par_list_last);
+  // var codes = invert_list_order(last_codes_detected);
+  // var pars = invert_list_order(par_list_last);
 	var last_id = ""; // save the last block id created in Scratch so it can be used to connect to the next one
 
   // DEBUG!!!
-  codes = [0, 4];
-  pars = [12];
+  // codes = [0, 4];
+  // pars = [12];
 
 
   console.log("teste codes ", codes);
@@ -182,14 +182,21 @@ document.addEventListener('keydown', function (e) {
   if(e.keyCode == 32) {
     console.log("space key");
     stop_reading = true;
+
+    // time test
+    codes = [0, 4, 1, 1, 1, 1, 1, 1];
+    pars = [12, 11, 11, 11, 11, 11, 11];
+
+    // time to create blocks before it runs
+    var time = 1.5 + 0.25 * (codes.length - 1);
     var createBlocks = new Promise(function(resolve) {
           createBlocksInScratch();
           setTimeout(function() {
               resolve();
-          }, (1000 * 5) );
+          }, (1000 * time ));
     });
     createBlocks.then(function() {
-      window.vm.greenFlag();
+      Scratch.vm.greenFlag();
     });
     e.preventDefault();
   }
