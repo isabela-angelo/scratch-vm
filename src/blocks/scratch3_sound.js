@@ -180,7 +180,7 @@ class Scratch3SoundBlocks {
     }
 
     playDrumForBeats (args, util) {
-        let drum = Cast.toNumber(args.DRUM);
+        let drum = Cast.toNumber(args.NUM);
         drum -= 1; // drums are one-indexed
         if (typeof this.runtime.audioEngine === 'undefined') return;
         drum = MathUtil.wrapClamp(drum, 0, this.runtime.audioEngine.numDrums - 1);

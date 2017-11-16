@@ -46,7 +46,7 @@
     "minilog": "3.1.0",
     "promise": "7.1.1",
     "scratch-audio": "latest",
-    "scratch-blocks": "latest",
+
     "scratch-render": "latest",
     "scratch-storage": "^0.2.0",
     "script-loader": "0.7.0",

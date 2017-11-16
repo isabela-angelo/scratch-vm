@@ -116,7 +116,7 @@ createBlocksInScratch = function() {
         changeEvent.run(true); // Event to change parameter
       }
       //add the parameter to play sound block
-      if (code_to_block[codes[i]] == 39) {
+      if (code_to_block[codes[i]] == 37) {
         // something is wrong with the change event in dropdown menus (error when the block is  deleted)
         // for now: no dropdown menus in blocks -> it is a number input area
         // var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: block.childBlocks_[0].id,
@@ -127,10 +127,10 @@ createBlocksInScratch = function() {
         changeEvent.run(true); // Event to change parameter
       }
       //add the parameter to play drum block
-      if (code_to_block[codes[i]] == 43) {
+      if (code_to_block[codes[i]] == 39) {
         var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: block.childBlocks_[0].id,
                 element: "field", name: "NUM", newValue: code_to_block[pars.shift()]+1}, workspace);
-        changeEvent.run(true); // Event to change parameter
+        changeEvent.run(true); // Event to change parameter    
       }
       //add the parameter to play sound with pitch block
       if (code_to_block[codes[i]] == 41) {
@@ -184,8 +184,8 @@ document.addEventListener('keydown', function (e) {
     stop_reading = true;
 
     // time test
-    codes = [0, 4, 1, 1, 1, 1, 1, 1];
-    pars = [12, 11, 11, 11, 11, 11, 11];
+    codes = [0, 4, 2, 2, 2, 2, 2, 2];
+    pars = [12, 10, 11, 12, 13, 14, 15];
 
     // time to create blocks before it runs
     var time = 1.5 + 0.25 * (codes.length - 1);
