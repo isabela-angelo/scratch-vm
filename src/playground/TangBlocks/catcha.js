@@ -15,11 +15,14 @@ var wait = 60;
 var repeat = 61;
 var end_repeat = 61.5;
 var key_if_block = 65;
+var end_key_if_block = 65.5;
 
 // codes and blocks or parameters in Scratch
-var code_to_block = {0:greenFlag_block, 1:meow_block, 2:drum_block, 4: wait, 5: repeat, 6: end_repeat, 7: key_if_block,
-  10: 0, 11: 1, 12: 2, 13: 3, 14: 4, 15: 5, 16: 6, 17: 7, 18: 8, 19: 9,20: 10,
-  21:'a', 22:'b'
+var code_to_block = {0:greenFlag_block, 1:meow_block, 2:drum_block, 4: wait, 5: repeat, 6: end_repeat, 7: key_if_block, 8: end_key_if_block,
+  10: 0, 11: 1, 12: 2, 13: 3, 14: 4, 15: 5, 16: 6, 17: 7, 18: 8, 19: 9,
+  21:'a', 22:'b', 23: 'c', 24: 'd', 25: 'e', 26: 'f', 27: 'g', 28: 'h', 29: 'i', 30: 'j', 31: 'k', 32: 'l',
+  33: 'm', 34: 'n', 35: 'o', 36: 'p', 37: 'q', 38: 'r', 39: 's', 40: 't', 41:'u', 42:'v', 43:'w', 44: 'x',
+  45: 'y', 46: 'z'
 };
 
 // check if the block regognized has already been added to the codes_detected list - comparing the positions
@@ -67,6 +70,7 @@ getPosition = function(pos) {
 createBlocksInScratch = function() {
   var workspace = Scratch.workspace;
   var flag_end_repeat = false;  //flag to put the next block outside the repeat
+  var flag_end_key_if = false; //flag to put the next block outside the key_if_block
   var last_repeat_id = ""; // block id of the last repeat found
 	// loop to delete the blocks that are in Scratch Script
   if (old_ids.length != 0){
@@ -219,6 +223,8 @@ createBlocksInScratch = function() {
 document.addEventListener('keydown', function (e) {
   if(e.keyCode == 32) {
     console.log("space key");
+    //var myAudio = document.getElementById("myAudio");
+    //myAudio.play();
     stop_reading = true;
 
     // time test
