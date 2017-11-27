@@ -14,11 +14,11 @@ var drum_block = 39;
 var wait = 60;
 var repeat = 61;
 var end_repeat = 61.5;
-var key_if_block = 65;
-var end_key_if_block = 65.5;
+var if_key_block = 65;
+var end_if_key_block = 65.5;
 
 // codes and blocks or parameters in Scratch
-var code_to_block = {0:greenFlag_block, 1:meow_block, 2:drum_block, 4: wait, 5: repeat, 6: end_repeat, 7: key_if_block, 8: end_key_if_block,
+var code_to_block = {0:greenFlag_block, 1:meow_block, 2:drum_block, 4: wait, 5: repeat, 6: end_repeat, 7: if_key_block, 8: end_if_key_block,
   10: 0, 11: 1, 12: 2, 13: 3, 14: 4, 15: 5, 16: 6, 17: 7, 18: 8, 19: 9,
   21:'a', 22:'b', 23: 'c', 24: 'd', 25: 'e', 26: 'f', 27: 'g', 28: 'h', 29: 'i', 30: 'j', 31: 'k', 32: 'l',
   33: 'm', 34: 'n', 35: 'o', 36: 'p', 37: 'q', 38: 'r', 39: 's', 40: 't', 41:'u', 42:'v', 43:'w', 44: 'x',
@@ -70,8 +70,9 @@ getPosition = function(pos) {
 createBlocksInScratch = function() {
   var workspace = Scratch.workspace;
   var flag_end_repeat = false;  //flag to put the next block outside the repeat
-  var flag_end_key_if = false; //flag to put the next block outside the key_if_block
-  var last_repeat_id = ""; // block id of the last repeat found
+  var flag_end_if_key = false; //flag to put the next block outside the if_key_block
+  var last_repeat_id = ""; // block id of the last repeat found --> it needs to be a pile if there is a repeat (or more) inside another repeat
+  var last_if_key_id = ""; // block id of the last if_key found
 	// loop to delete the blocks that are in Scratch Script
   if (old_ids.length != 0){
     var delete_blocks = new window.Blockly.Events.fromJson({type: Blockly.Events.DELETE,
@@ -85,11 +86,6 @@ createBlocksInScratch = function() {
   // var pars = invert_list_order(par_list_last);
 	var last_id = ""; // save the last block id created in Scratch so it can be used to connect to the next one
 
-  // DEBUG!!!
-  // codes = [0, 4];
-  // pars = [12];
-
-
   console.log("teste codes ", codes);
   console.log("teste pars ", pars);
 	// loop to create the blocks and connect them
@@ -97,122 +93,131 @@ createBlocksInScratch = function() {
     if (code_to_block[codes[i]] == 61.5) {
       flag_end_repeat = true; // the next block will be outside the repeat
     }
-    //[65, 75, 63, 75]
-    else if (code_to_block[codes[i]] == 65) {
-      console.log('Aqui');
-      var xml = [
-        ' <block type="control_wait_until" id="uU|sqMl9T(WO1qDu.PXn">',
-        '      <value name="CONDITION">',
-        '        <block type="sensing_keypressed" id="A4LHdi#y!v5)oW4};^JK">',
-        '          <value name="KEY_OPTION">',
-        '            <shadow type="sensing_keyoptions">',
-        '              <field name="KEY_OPTION">any</field>',
-        '            </shadow>',
-        '          </value>',
-        '        </block>',
-        '      </value>',
-        '      <next>',
-        '        <block type="control_if" id="IKWpZp{dKlen,JmlBU4n">',
-        '          <value name="CONDITION">',
-        '            <block type="sensing_keypressed" id="hkQyznmhA(!Z[@P|N+Qk">',
-        '              <value name="KEY_OPTION">',
-        '                <shadow type="sensing_keyoptions">',
-        '                   <field name="KEY_OPTION">' + code_to_block[pars.shift()] + '</field>',
-        '               </shadow>',
-        '              </value>',
-        '            </block>',
-        '          </value>',
-        '          <statement name="SUBSTACK">',
-        '        </statement>',
-        '        </block>',
-        '      </next>',
-        '    </block>'
-      ].join('\n');
-
-      xml = '<xml xmlns="http://www.w3.org/1999/xhtml">' + xml + '</xml>';
-      var dom = window.Blockly.Xml.textToDom(xml);
-      Blockly.Xml.domToWorkspace(dom, workspace);
-      //var block = window.Blockly.Xml.domToBlock(dom, workspace);
-      //block.initSvg();
-      console.log('Foi?');
-
-      old_ids.push("uU|sqMl9T(WO1qDu.PXn");
-      old_ids.push("A4LHdi#y!v5)oW4};^JK");
-      old_ids.push("IKWpZp{dKlen,JmlBU4n");
-      old_ids.push("hkQyznmhA(!Z[@P|N+Qk");
-
-      var this_block = {id: "uU|sqMl9T(WO1qDu.PXn"};
+    else if (code_to_block[codes[i]] == 65.5) {
+      flag_end_if_key = true; // the next block will be outside the if_key
     }
     else {
-  		var toolbox = workspace.options.languageTree;
-  		var blocks = toolbox.getElementsByTagName('block');
-  		var blockXML = blocks[code_to_block[codes[i]]];
-  		var this_block = window.Blockly.Xml.domToBlock(blockXML, workspace);
+      if (code_to_block[codes[i]] == 65) {
+        var xml = [
+          ' <block type="control_wait_until" id="uU|sqMl9T(WO1qDu.PXn">',
+          '      <value name="CONDITION">',
+          '        <block type="sensing_keypressed" id="A4LHdi#y!v5)oW4);^JK">',
+          '          <value name="KEY_OPTION">',
+          '            <shadow type="sensing_keyoptions">',
+          '              <field name="KEY_OPTION">any</field>',
+          '            </shadow>',
+          '          </value>',
+          '        </block>',
+          '      </value>',
+          '      <next>',
+          '        <block type="control_if" id="IKWpZp(dKlen,JmlBU4n">',
+          '          <value name="CONDITION">',
+          '            <block type="sensing_keypressed" id="hkQyznmhA(!Z[@P|N+Qk">',
+          '              <value name="KEY_OPTION">',
+          '                <shadow type="sensing_keyoptions">',
+          '                   <field name="KEY_OPTION">' + code_to_block[pars.shift()] + '</field>',
+          '               </shadow>',
+          '              </value>',
+          '            </block>',
+          '          </value>',
+          '        </block>',
+          '      </next>',
+          '    </block>'
+        ].join('\n');
 
-      //if (code_to_block[codes[i]] == 84) {
-        //console.log("lalal ", Object.getOwnPropertyNames(block));
-        //console.log(block);
-        //console.log(block.childBlocks_[0]);
-      //}
+        xml = '<xml xmlns="http://www.w3.org/1999/xhtml">' + xml + '</xml>';
+        var dom = window.Blockly.Xml.textToDom(xml);
+        Blockly.Xml.domToWorkspace(dom, workspace);
 
-  		this_block.initSvg();
-      old_ids.push(this_block.id);
+        old_ids.push("uU|sqMl9T(WO1qDu.PXn");
+        old_ids.push("A4LHdi#y!v5)oW4);^JK");
+        old_ids.push("IKWpZp(dKlen,JmlBU4n");
+        old_ids.push("hkQyznmhA(!Z[@P|N+Qk");
 
-      //console.log ("id:", block.id)
-
-      //add the parameter to wait block
-      if (code_to_block[codes[i]] == 60) {
-        var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: this_block.childBlocks_[0].id,
-                element: "field", name: "NUM", newValue: code_to_block[pars.shift()]}, workspace);
-        changeEvent.run(true); // Event to change parameter
-      }
-      //add the parameter to play sound block
-      if (code_to_block[codes[i]] == 37) {
-        // something is wrong with the change event in dropdown menus (error when the block is  deleted)
-        // for now: no dropdown menus in blocks -> it is a number input area
-        // var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: block.childBlocks_[0].id,
-        //         element: "field", name: "SOUND_MENU", newValue: code_to_block[pars.shift()]}, workspace);
-        // changeEvent.run(true); // Event to change parameter
-        var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: this_block.childBlocks_[0].id,
-                element: "field", name: "NUM", newValue: code_to_block[pars.shift()]}, workspace);
-        changeEvent.run(true); // Event to change parameter
-      }
-      //add the parameter to play drum block
-      if (code_to_block[codes[i]] == 39) {
-        var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: this_block.childBlocks_[0].id,
-                element: "field", name: "NUM", newValue: code_to_block[pars.shift()]+1}, workspace);
-        changeEvent.run(true); // Event to change parameter
-      }
-      //add the parameter to repeat block
-      if (code_to_block[codes[i]] == 61) {
-        var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: this_block.childBlocks_[0].id,
-                element: "field", name: "NUM", newValue: code_to_block[pars.shift()]}, workspace);
-        changeEvent.run(true); // Event to change parameter
-      }
-
-
-    }
-		if (last_id.localeCompare("") != 0) {
-			child_id = this_block.id;
-			parent_id = last_id;
-      if (code_to_block[codes[i-1]] != null && code_to_block[codes[i-1]] == 61) { // if last block was a loop
-        last_repeat_id = last_id; // save id
-        var moveEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.MOVE, blockId: child_id,
-                 newParentId: parent_id, newInputName: "SUBSTACK"}, workspace);
-        moveEvent.run(true); // Event to connect the blocks
-
+        var this_block = {id: "uU|sqMl9T(WO1qDu.PXn"};
       }
       else {
-        if (flag_end_repeat) {
-          flag_end_repeat = false;
-          parent_id = last_repeat_id;
+    		var toolbox = workspace.options.languageTree;
+    		var blocks = toolbox.getElementsByTagName('block');
+    		var blockXML = blocks[code_to_block[codes[i]]];
+    		var this_block = window.Blockly.Xml.domToBlock(blockXML, workspace);
+
+        //if (code_to_block[codes[i]] == 84) {
+          //console.log("lalal ", Object.getOwnPropertyNames(block));
+          //console.log(block);
+          //console.log(block.childBlocks_[0]);
+        //}
+
+    		this_block.initSvg();
+        old_ids.push(this_block.id);
+
+        //console.log ("id:", block.id)
+
+        //add the parameter to wait block
+        if (code_to_block[codes[i]] == 60) {
+          var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: this_block.childBlocks_[0].id,
+                  element: "field", name: "NUM", newValue: code_to_block[pars.shift()]}, workspace);
+          changeEvent.run(true); // Event to change parameter
         }
-        var moveEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.MOVE, blockId: child_id,
-                 newParentId: parent_id}, workspace);
-        moveEvent.run(true); // Event to connect the blocks
+        //add the parameter to play sound block
+        if (code_to_block[codes[i]] == 37) {
+          // something is wrong with the change event in dropdown menus (error when the block is  deleted)
+          // for now: no dropdown menus in blocks -> it is a number input area
+          // var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: block.childBlocks_[0].id,
+          //         element: "field", name: "SOUND_MENU", newValue: code_to_block[pars.shift()]}, workspace);
+          // changeEvent.run(true); // Event to change parameter
+          var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: this_block.childBlocks_[0].id,
+                  element: "field", name: "NUM", newValue: code_to_block[pars.shift()]}, workspace);
+          changeEvent.run(true); // Event to change parameter
+        }
+        //add the parameter to play drum block
+        if (code_to_block[codes[i]] == 39) {
+          var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: this_block.childBlocks_[0].id,
+                  element: "field", name: "NUM", newValue: code_to_block[pars.shift()]+1}, workspace);
+          changeEvent.run(true); // Event to change parameter
+        }
+        //add the parameter to repeat block
+        if (code_to_block[codes[i]] == 61) {
+          var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: this_block.childBlocks_[0].id,
+                  element: "field", name: "NUM", newValue: code_to_block[pars.shift()]}, workspace);
+          changeEvent.run(true); // Event to change parameter
+        }
       }
-		}
-		last_id = this_block.id;
+
+  		if (last_id.localeCompare("") != 0) {
+  			child_id = this_block.id;
+  			parent_id = last_id;
+        if (code_to_block[codes[i-1]] != null && code_to_block[codes[i-1]] == 61) { // if last block was a loop
+          last_repeat_id = last_id; // save id
+          var moveEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.MOVE, blockId: child_id,
+                   newParentId: parent_id, newInputName: "SUBSTACK"}, workspace);
+          moveEvent.run(true); // Event to connect the blocks
+
+        }
+        else if (code_to_block[codes[i-1]] != null && code_to_block[codes[i-1]] == 65) { // if last block was a if_key
+          last_if_key_id = "IKWpZp(dKlen,JmlBU4n"; // save if block id of the if_key block
+          var moveEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.MOVE, blockId: child_id,
+                   newParentId: "IKWpZp(dKlen,JmlBU4n", newInputName: "SUBSTACK"}, workspace);
+          moveEvent.run(true); // Event to connect the blocks
+
+        }
+        else {
+          if (flag_end_repeat) {
+            flag_end_repeat = false;
+            parent_id = last_repeat_id;
+          }
+          if (flag_end_if_key) {
+            flag_end_if_key = false;
+            parent_id = last_if_key_id;
+          }
+          var moveEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.MOVE, blockId: child_id,
+                   newParentId: parent_id}, workspace);
+          moveEvent.run(true); // Event to connect the blocks
+        }
+      }
+      last_id = this_block.id;
+    }
+    //
 	}
   old_codes = codes_detected;
   stop_reading = false;
@@ -222,14 +227,15 @@ createBlocksInScratch = function() {
 // when the spcabar is pressed the blocks are created in Scratch and then the code runs
 document.addEventListener('keydown', function (e) {
   if(e.keyCode == 32) {
-    console.log("space key");
-    //var myAudio = document.getElementById("myAudio");
-    //myAudio.play();
     stop_reading = true;
+    console.log("space key");
+    var myAudio = document.getElementById("myAudio");
+    myAudio.play();
 
-    // time test
-    codes = [0, 7];
-    pars = [21];
+
+    // DEBUG
+    codes = [0, 7, 2, 2, 8, 2];
+    pars = [21, 11, 11, 11];
 
     // time to create blocks before it runs
     var time = 1.5 + 0.25 * (codes.length - 1);
@@ -241,6 +247,7 @@ document.addEventListener('keydown', function (e) {
     });
     createBlocks.then(function() {
       Scratch.vm.greenFlag();
+      myAudio.play();
     });
     e.preventDefault();
   }
